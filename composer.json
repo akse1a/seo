@@ -1,6 +1,6 @@
 {
     "name": "akse1a/seo",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "description": "A PHP library for working with SEO meta tags, Open Graph, Schema.org markup, and sitemap.xml generation",
     "type": "library",
     "keywords": ["seo", "meta", "open-graph", "schema", "sitemap", "xml", "html"],
