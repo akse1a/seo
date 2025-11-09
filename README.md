@@ -217,6 +217,18 @@ foreach ($pages as $page) {
 $sitemap->save('sitemap.xml');
 ```
 
+## Development
+
+### Requirements
+
+- PHP 8.0 or higher
+- Composer
+
+### Install Dependencies for Development
+
+```bash
+composer install
+```
 
 ### Run Examples
 
