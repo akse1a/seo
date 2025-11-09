@@ -1,0 +1,14 @@
+/vendor/
+composer.lock
+.idea/
+.phpunit.result.cache
+.php_cs.cache
+*.log
+.DS_Store
+Thumbs.db
+sitemap.xml
+example_sitemap.php
+
+# Docker
+.docker/
+

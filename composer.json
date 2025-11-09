@@ -1,0 +1,25 @@
+{
+    "name": "akse1a/seo",
+    "version": "1.0.0",
+    "description": "A PHP library for working with SEO meta tags, Open Graph, Schema.org markup, and sitemap.xml generation",
+    "type": "library",
+    "keywords": ["seo", "meta", "open-graph", "schema", "sitemap", "xml", "html"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "akse1a",
+            "email": "aksela_it@mail.ru"
+        }
+    ],
+    "require": {
+        "php": "^8.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Akse1a\\Seo\\": "src/"
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}
+
