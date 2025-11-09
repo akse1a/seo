@@ -22,7 +22,7 @@ final class Sitemap
     private const string SITEMAP_NAMESPACE = 'http://www.sitemaps.org/schemas/sitemap/0.9';
 
     /**
-     * @var array<int, array{loc: string, lastmod?: string, changefreq?: string, priority?: string}>
+     * @var array<string, array{loc: string, lastmod?: string, changefreq?: string, priority?: string}>
      */
     private array $urls = [];
 
@@ -42,18 +42,33 @@ final class Sitemap
         ChangeFrequency|string|null $changefreq = null,
         ?float $priority = null
     ): self {
-        if ($this->count() >= self::MAX_URLS) {
-            throw new InvalidArgumentException(
-                sprintf('Sitemap cannot contain more than %d URLs', self::MAX_URLS)
-            );
-        }
-
         // URL validation
         if (!UrlValidator::isValid($loc)) {
             throw new InvalidArgumentException(sprintf('Invalid URL: %s', $loc));
         }
 
-        $url = ['loc' => $loc];
+        // Normalize URL for duplicate detection (remove trailing slash differences, etc.)
+        $normalizedUrl = $this->normalizeUrl($loc);
+
+        // Check if URL already exists
+        $isNewUrl = !isset($this->urls[$normalizedUrl]);
+
+        // Check max URLs limit only for new URLs
+        if ($isNewUrl && $this->count() >= self::MAX_URLS) {
+            throw new InvalidArgumentException(
+                sprintf('Sitemap cannot contain more than %d URLs', self::MAX_URLS)
+            );
+        }
+
+        // Get existing URL or create new one
+        if ($isNewUrl) {
+            $url = ['loc' => $loc];
+        } else {
+            // Update existing URL - keep existing values, update only new ones
+            $url = $this->urls[$normalizedUrl];
+            // Update location if different (shouldn't happen, but just in case)
+            $url['loc'] = $loc;
+        }
 
         // Process lastmod
         if ($lastmod !== null) {
@@ -104,7 +119,8 @@ final class Sitemap
             }
         }
 
-        $this->urls[] = $url;
+        // Store URL using normalized URL as key to prevent duplicates
+        $this->urls[$normalizedUrl] = $url;
         return $this;
     }
 
@@ -274,6 +290,80 @@ final class Sitemap
      */
     public function getUrls(): array
     {
-        return $this->urls;
+        return array_values($this->urls);
+    }
+
+    /**
+     * Check if URL exists in sitemap
+     *
+     * @param string $url URL to check
+     * @return bool
+     */
+    public function hasUrl(string $url): bool
+    {
+        if (!UrlValidator::isValid($url)) {
+            return false;
+        }
+
+        $normalizedUrl = $this->normalizeUrl($url);
+        return isset($this->urls[$normalizedUrl]);
+    }
+
+    /**
+     * Normalize URL for duplicate detection
+     * Normalizes scheme and host to lowercase, removes trailing slashes (except root path)
+     *
+     * @param string $url URL to normalize
+     * @return string Normalized URL
+     */
+    private function normalizeUrl(string $url): string
+    {
+        // Parse URL to handle scheme and host case insensitivity
+        $parsed = parse_url($url);
+        
+        if ($parsed === false) {
+            // If URL cannot be parsed, do simple normalization
+            return strtolower(trim($url, '/'));
+        }
+
+        // Rebuild URL with normalized scheme and host
+        $normalized = '';
+        
+        // Normalize scheme (http, https, etc.)
+        if (isset($parsed['scheme'])) {
+            $normalized .= strtolower($parsed['scheme']) . '://';
+        }
+        
+        // Normalize host (domain name)
+        if (isset($parsed['host'])) {
+            $normalized .= strtolower($parsed['host']);
+        }
+        
+        // Port (keep as is)
+        if (isset($parsed['port'])) {
+            $normalized .= ':' . $parsed['port'];
+        }
+        
+        // Path - remove trailing slash except for root
+        if (isset($parsed['path'])) {
+            $path = $parsed['path'];
+            // Remove trailing slash, but keep single slash for root
+            if ($path !== '/' && $path !== '') {
+                $path = rtrim($path, '/');
+            }
+            $normalized .= $path;
+        }
+        
+        // Query string (keep as is, order matters for some URLs)
+        if (isset($parsed['query'])) {
+            $normalized .= '?' . $parsed['query'];
+        }
+        
+        // Fragment (keep as is)
+        if (isset($parsed['fragment'])) {
+            $normalized .= '#' . $parsed['fragment'];
+        }
+
+        return $normalized;
     }
 }

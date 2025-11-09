@@ -183,6 +183,26 @@ exit;
 - `$changefreq` (optional) - Change frequency: string or `ChangeFrequency` enum
 - `$priority` (optional) - Priority from 0.0 to 1.0 (automatically validated)
 
+#### Duplicate URL Handling
+
+The library automatically prevents duplicate URLs in the sitemap. If you try to add the same URL twice:
+
+- **Duplicate URLs are automatically detected** using URL normalization (case-insensitive scheme/host, trailing slash handling)
+- **Existing URL is updated** with new parameters if provided (lastmod, changefreq, priority)
+- **Original parameters are preserved** if new ones are not provided
+
+Examples of URLs considered duplicates:
+- `https://example.com/page` and `https://example.com/page/` (trailing slash)
+- `https://Example.com/page` and `https://example.com/page` (case difference)
+- `http://example.com/page` and `https://example.com/page` (different schemes are NOT considered duplicates)
+
+You can check if a URL exists using:
+```php
+if ($sitemap->hasUrl('https://example.com/page')) {
+    echo "URL already exists in sitemap";
+}
+```
+
 #### Error Handling
 
 The library throws exceptions for invalid data:
