@@ -217,61 +217,6 @@ foreach ($pages as $page) {
 $sitemap->save('sitemap.xml');
 ```
 
-## Docker
-
-### Quick Start
-
-For quick start, use the script:
-
-```bash
-./docker-run.sh
-```
-
-Or manually:
-
-```bash
-# Start container
-docker-compose up -d
-
-# Enter container
-docker-compose exec php bash
-
-# Install dependencies inside container
-composer install
-
-# Run example
-php example_sitemap.php
-```
-
-### Useful Commands
-
-```bash
-# Stop container
-docker-compose down
-
-# Rebuild image
-docker-compose build
-
-# View logs
-docker-compose logs -f
-
-# Execute PHP command in container
-docker-compose exec php php --version
-docker-compose exec php php example_sitemap.php
-```
-
-## Development
-
-### Requirements
-
-- PHP 8.0 or higher
-- Composer
-
-### Install Dependencies for Development
-
-```bash
-composer install
-```
 
 ### Run Examples
 

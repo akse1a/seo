@@ -10,5 +10,6 @@ sitemap.xml
 example_sitemap.php
 
 # Docker
-.docker/
+docker-compose.yml
+Dockerfile
 
